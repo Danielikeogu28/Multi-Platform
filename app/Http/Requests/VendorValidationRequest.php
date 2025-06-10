@@ -11,7 +11,7 @@ class VendorValidationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,10 +23,13 @@ class VendorValidationRequest extends FormRequest
     {
         return [
             'business_name' => 'required|string|max:255',
-            'business_email' => 'required|string|email|max:255|unique:vendors,business_email',
+            'email' => 'required|string|email|max:255|unique:vendors,email',
             'business_address' => 'required|string|max:255',
+            'home_address' => 'required|string|max:100',
+            'street' => 'required|string|max:100',
             'state' => 'required|string|max:100',
             'city' => 'required|string|max:100',
+            'country' => 'required|string|max:100',
             'phone' => 'required|string|max:15|unique:vendors,phone',
             'password' => 'required|string|min:8|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',

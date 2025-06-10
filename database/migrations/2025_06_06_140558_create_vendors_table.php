@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('business_name')->unique();
             $table->string('business_address');
+            $table->string('home_address');
+            $table->string('email')->unique();
+            $table->string('street');
             $table->string('state');
             $table->string('city');
-            $table->string('email')->unique();
+            $table->string('country');
             $table->string('phone');
             $table->string('password');
             $table->string('profile_image')->nullable();

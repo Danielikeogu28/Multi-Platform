@@ -13,4 +13,8 @@ Route::middleware('guest')->group(function (){
     Route::post('/register', [UserController::class, 'register']);
 });
 
-Route::get('/categories', [VendorController::class, 'getcategories']);
+Route::prefix('vendor')->group(function () {
+    Route::get('/categories', [VendorController::class, 'getcategories']);
+    Route::post('/register', [VendorController::class, 'register']);
+    Route::post('/login', [VendorController::class, 'login']);
+});
