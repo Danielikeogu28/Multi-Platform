@@ -41,8 +41,8 @@ return [
             'provider' => 'users',
         ],
         'vendor' => [
-            'driver' => 'session', // use 'sanctum' for API token-based auth
-            'provider' => 'vendors',
+            'driver' => 'sanctum', // use 'sanctum' for API token-based auth
+            'provider' => 'vendor',
         ],
 
     ],
@@ -70,7 +70,7 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        'vendors' => [
+        'vendor' => [
             'driver' => 'eloquent',
             'model' => App\Models\Vendor::class, // for vendors
         ],
@@ -102,6 +102,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        
     ],
 
     /*

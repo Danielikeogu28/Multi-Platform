@@ -13,9 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         $this->call([
-            VendorCategoriesSeeder::class,
-            IsAdmin::class,
-         ]);
+        $this->call(ProductCategorySeeder::class);
+        $this->call(VendorCategoriesSeeder::class);  // If exists
+        $this->call(IsAdmin::class);
     }
 }

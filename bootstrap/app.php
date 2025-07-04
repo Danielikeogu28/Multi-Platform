@@ -39,6 +39,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
 
         ]);
+        $middleware->alias([
+            'admin' => App\Http\Middleware\IsAdminMiddleware::class,
+            'vendor' => App\Http\Middleware\IsVendorMiddleware::class,
+            'check.vendor.category' => \App\Http\Middleware\CheckVendorCategory::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $e, Request $request) {

@@ -33,7 +33,7 @@ class VendorValidationRequest extends FormRequest
             'phone' => 'required|string|max:15|unique:vendors,phone',
             'password' => 'required|string|min:8|confirmed',
             'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'category_id' => 'required|exists:categories,id',
+            'vendor_category_id' => 'required|exists:vendor_categories,id',
 
         ];
     }

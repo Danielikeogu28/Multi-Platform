@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('product_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name'); //e.g., Fashion, Electronics
-            $table->string('slug')->unique(); 
-            $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade'); // For subcategories
+            $table->string('slug')->unique();
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('product_categories')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

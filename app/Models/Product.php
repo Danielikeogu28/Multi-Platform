@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
+        'image',
         'name',
         'description',
         'price',
         'condition',
         'status',
         'vendor_id',
-        'category_id'
+        'product_category_id'
     ];
-
-    public function images()
+     public function images()
     {
         return $this->hasMany(ProductImage::class);
     }
@@ -26,7 +26,7 @@ class Product extends Model
         return $this->hasMany(ProductColor::class);
     }
 
-    public function categories()
+    public function category()
     {
         return $this->belongsTo(ProductCategory::class);
     }

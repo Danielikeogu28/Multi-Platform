@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\VendorCategories;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ class VendorCategoriesSeeder extends Seeder
      */
     public function run(): void
     {
-        $categories = [
+        $vendor_category = [
             'E-commerces Vendor',
             'Ride-hailing Vendor',
             'Service Apartments',
@@ -21,17 +22,13 @@ class VendorCategoriesSeeder extends Seeder
             'Automobile Maintenance'
         ];
 
-        foreach ($categories as $category){
-            DB::table('categories')->updateOrInsert(
+        foreach ($vendor_category as $category) {
+            VendorCategories::firstOrCreate(
                 [
-            'name' => $category,
-        ],
-        [
-            'has_custom_fields' => false,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+                    'name' => $category,
+                    'has_custom_fields' => false,
+                ],
+            );
         }
-
     }
 }

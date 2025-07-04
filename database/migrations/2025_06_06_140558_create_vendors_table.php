@@ -24,8 +24,12 @@ return new class extends Migration
             $table->string('phone');
             $table->string('password');
             $table->string('profile_image')->nullable();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->string('role')->default('vendors');
+            $table->boolean('is_verified')->default(true);
+            $table->boolean('is_active')->default(true);
+
+            $table->foreignId('vendor_category_id')->constrained('vendor_categories')->onDelete('cascade');
+
+            $table->string('role')->default('vendor');
             $table->timestamps();
         });
     }

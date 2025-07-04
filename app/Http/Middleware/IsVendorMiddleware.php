@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsAdminMiddleware
+class IsVendorMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,11 +16,15 @@ class IsAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if the user is authenticated and has the 'admin' role
-        if(Auth::check() && Auth::user()->role === 'admin') {
-            return $next($request);
+        $vendor = Auth::guard('vendor')->user();
+
+       if(Auth::check() && Auth::user()->role !== 'vendor'){
+        
+        return response()->json(['message' => 'Unauthorized. Vendor role required...'], 403);
+            
         }
-        // If not an admin, redirect to home or show an error
-        return response()->json(['message' => 'Unauthorized Access'], 403);
+        // If not a vendor, redirect to home or show an error
+        return $next($request);
     }
+    
 }

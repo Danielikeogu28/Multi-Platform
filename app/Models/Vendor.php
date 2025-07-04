@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Vendor extends Model
+class Vendor extends Authenticatable
 {
     use HasApiTokens, Notifiable;
+
     protected $fillable = [
         'business_name',
         'business_address',
@@ -21,7 +22,7 @@ class Vendor extends Model
         'phone',
         'password',
         'profile_image',
-        'category_id',
+        'vendor_category_id',
     ];
 
     protected $hidden = [
@@ -30,7 +31,7 @@ class Vendor extends Model
 
     public function category()
     {
-        return $this->belongsTo(Categories::class);
+        return $this->belongsTo(VendorCategories::class, 'vendor_category_id', 'id');
     }
-    
+   
 }

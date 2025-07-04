@@ -4,62 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VendorValidationRequest;
+use App\Http\Resources\VendorResource;
 use App\Models\Categories;
 use App\Models\Vendor;
+use App\Models\VendorCategories;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class VendorController extends Controller
 {
-
-    /**
-     * @OA\Get(
-     *     path="/api/vendor/categories",
-     *     summary="Get list of vendor categories for signup",
-     *     tags={"Vendor"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Categories retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="success"),
-     *             @OA\Property(property="message", type="string", example="Categories retrieved successfully"),
-     *             @OA\Property(
-     *                 property="categories",
-     *                 type="object",
-     *                 additionalProperties={
-     *                     "type": "string"
-     *                 },
-     *                 example={"1": "Food", "2": "E-commerce", "3": "Electronics"}
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
-     */
-
-
-    /**
-     * Get list of vendor categories for signup.
-     *
-     * @return JsonResponse 
-     */
-    public function getcategories(): JsonResponse
-    {
-
-        $categories = Categories::pluck('name', 'id')->toArray();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Categories retrieved successfully',
-            'categories' => $categories,
-        ], 200);
-    }
-
-
     /**
      * @OA\Post(
      *     path="/api/vendor/register",
@@ -86,7 +41,7 @@ class VendorController extends Controller
      *                 @OA\Property(property="country", type="string", example="Nigeria"),
      *                 @OA\Property(property="phone", type="string", example="+2348012345678"),
      *                 @OA\Property(property="password", type="string", format="password", example="securepass123"),
-     *                 @OA\Property(property="category_id", type="integer", example=2),
+     *                 @OA\Property(property="vendor_category_id", type="integer", example=2),
      *                 @OA\Property(property="profile_image", type="string", format="binary")
      *             )
      *         )
@@ -113,32 +68,39 @@ class VendorController extends Controller
 
     public function register(VendorValidationRequest $request)
     {
-        $validatedData = $request->validated();
+        try {
+            $vendor = $request->validated();
 
-        $profilePath = $request->hasFile('profile_image')
-            ? $request->file('profile_image')->store('vendor', 'public')
-            : 'default_image/vendor.png';
+            $profilePath = $request->hasFile('profile_image')
+                ? $request->file('profile_image')->store('vendor', 'public')
+                : 'default_image/vendor.png';
 
 
-        $vendor = Vendor::create([
-            'business_name' => $validatedData['business_name'],
-            'business_address' => $validatedData['business_address'],
-            'home_address' => $validatedData['home_address'],
-            'email' => $validatedData['email'],
-            'street' => $validatedData['street'],
-            'city' => $validatedData['city'],
-            'state' => $validatedData['state'],
-            'country' => $validatedData['country'],
-            'phone' => $validatedData['phone'],
-            'password' => $validatedData['password'],
-            'category_id' => $validatedData['category_id'],
-            'profile_image' => $profilePath
-        ]);
+            $vendor = Vendor::create([
+                'business_name' => $vendor['business_name'],
+                'business_address' => $vendor['business_address'],
+                'home_address' => $vendor['home_address'],
+                'email' => $vendor['email'],
+                'street' => $vendor['street'],
+                'city' => $vendor['city'],
+                'state' => $vendor['state'],
+                'country' => $vendor['country'],
+                'phone' => $vendor['phone'],
+                'password' => Hash::make($vendor['password']),
+                'vendor_category_id' => $vendor['vendor_category_id'],
+                'profile_image' => $profilePath
+            ]);
 
-        return response()->json([
-            'message' => 'Vendor registered successfully',
-            'vendor' => $vendor
-        ], 200);
+            return response()->json([
+                'message' => 'Vendor registered successfully',
+                'vendor' => new VendorResource($vendor)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Vendor registration failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
@@ -181,22 +143,28 @@ class VendorController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only(['email', 'password']);
 
-        if (Auth::guard('vendor')->attempt($credentials)) {
-            $vendor = Auth::guard('vendor')->user();
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:6',
+        ]);
 
-            $token = $vendor->createToken('Personal Access Token')->plainTextToken;
+        $vendor = Vendor::where('email', $request->email)->first();
+        if (!$vendor || !Hash::check($request->password, $vendor->password)) {
 
             return response()->json([
-                'message' => 'Login successful',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'vendor' => $vendor,
-            ], 200);
-        }
+                'status' => 'Fail',
+                'message' => 'Invalid Credentials'
+            ], 401);
+        };
+        $token = $vendor->createToken('Vendor Access Token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Invalid Credentials'
-        ], 401);
+            'message' => 'Login successful',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'vendor' => $vendor,
+        ], 200);
     }
+    public function logout() {}
 }

@@ -44,7 +44,7 @@ class IsAdmin extends Seeder
                 'country' => 'Nigeria',
                 'profile_image' => 'https://example.com/default-profile-image.png',
                 'role' => 'admin',
-                'category_id' => $category?->id ?? 1,
+                'Vendor_category_id' => $vendor_category?->id ?? 1,
                 'created_at' => now(),
                 'updated_at' => now()
             ]
