@@ -71,11 +71,12 @@ class VendorController extends Controller
         try {
             $vendor = $request->validated();
 
+              $vendor = strtolower($vendor['email']);
+
             $profilePath = $request->hasFile('profile_image')
                 ? $request->file('profile_image')->store('vendor', 'public')
                 : 'default_image/vendor.png';
-
-
+          
             $vendor = Vendor::create([
                 'business_name' => $vendor['business_name'],
                 'business_address' => $vendor['business_address'],
@@ -148,8 +149,9 @@ class VendorController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
-
-        $vendor = Vendor::where('email', $request->email)->first();
+      
+        $email = strtolower($request->email);
+        $vendor = Vendor::where('email', $email)->first();
         if (!$vendor || !Hash::check($request->password, $vendor->password)) {
 
             return response()->json([

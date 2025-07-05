@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Middleware\IsAdminMiddleware;
+use App\Http\Middleware\CheckVendorCategory;
 use App\Http\Middleware\IsVendorMiddleware;
 use App\Http\Requests\ProductUpdateValidationRequest;
 use App\Http\Requests\ProductValidationRequest;
@@ -22,7 +22,7 @@ class ProductController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(IsVendorMiddleware::class),
+            new Middleware(CheckVendorCategory::class),
         ];
     }
     /**
@@ -35,19 +35,7 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function index(Request $request)
     {
-        $vendor = auth('vendor')->user();
-        if ($vendor->category->name !== 'E-commerces Vendor') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Access denied. Only E-commerce vendors can view products.',
-
-            ], 403);
-        }
-
-        $products = Product::with('vendor')
-            ->where('vendor_id', $vendor->id)
-            ->where('product_category', $request->product_category_id)
-            ->get();
+      $products = Product::with(['vendor', 'category', 'reviews'])->latest()->get();
 
         if ($products->isEmpty()) {
             return response()->json([
@@ -58,7 +46,7 @@ class ProductController extends Controller implements HasMiddleware
         return response()->json([
             'status' => 'success',
             'message' => 'Products retrieved successfully',
-            'products' => $products,
+            'products' => ProductResource::collection($products),
         ], 200);
     }
 
@@ -110,13 +98,14 @@ class ProductController extends Controller implements HasMiddleware
             foreach ($request->images as $image) {
                 $fileName = $image->store('', 'public');
                 $filePath = 'uploads/products/' . $fileName;
-
                 ProductImage::create([
                     'image_path' => $filePath,
                     'product_id' => $product->id
                 ]);
             }
         }
+        $product->load(['vendor', 'category']);
+        
         return response()->json([
             'status' => 'success',
             'message' => 'Product created successfully',
@@ -136,21 +125,18 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function show(string $id)
     {
-        $vendor = auth('vendor')->user();
-        if ($vendor->category->name !== 'E-commerces Vendor') {
+    
+        $products = Product::with('vendor', 'category', 'reviews')->findOrFail($id);
+        if ($products->isEmpty()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Access denied. Only E-commerce vendors can show products.',
-            ]);
+                'message' => 'Product not found',
+            ], 404);
         }
-
-        $product = Product::with('colors', 'images')->findOrFail($id);
-
-
         return response()->json([
             'status' => 'success',
             'message' => 'Product retrieved successfully',
-            'product' => $product,
+            'product' => $products,
         ], 200);
     }
 

@@ -17,9 +17,9 @@ class VendorCategoriesSeeder extends Seeder
         $vendor_category = [
             'E-commerces Vendor',
             'Ride-hailing Vendor',
-            'Service Apartments',
-            'Food',
-            'Automobile Maintenance'
+            'Service Apartment Vendor',
+            'Food Vendor',
+            'Automobile Maintenance Vendor'
         ];
 
         foreach ($vendor_category as $category) {

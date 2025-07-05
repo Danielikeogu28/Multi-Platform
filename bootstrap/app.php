@@ -1,6 +1,4 @@
 <?php
-
-
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -42,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => App\Http\Middleware\IsAdminMiddleware::class,
             'vendor' => App\Http\Middleware\IsVendorMiddleware::class,
-            'check.vendor.category' => \App\Http\Middleware\CheckVendorCategory::class,
+            'vendor.category' => \App\Http\Middleware\CheckVendorCategory::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

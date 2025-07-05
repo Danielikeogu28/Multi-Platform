@@ -14,12 +14,13 @@ class CheckVendorCategory
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure  $expectedCategory,  $next): Response
+    public function handle(Request $request, Closure $next): Response
     {
         $vendor = auth('vendor')->user();
-        if($vendor && $vendor->category !== $expectedCategory){
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if($vendor && optional($vendor->category)->name !== 'E-commerces Vendor'){
+            return response()->json(['message' => 'Unauthorized. Category access denied'], 403);
         }
+
         return $next($request);
     }
 }

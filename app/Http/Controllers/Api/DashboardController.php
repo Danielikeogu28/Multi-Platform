@@ -20,7 +20,7 @@ class DashboardController extends Controller
             ], 401);
         }
 
-        $vendor->lo ad('category');
+        $vendor->load('category');
         $data = [];
 
         switch ($vendor->category->name){
